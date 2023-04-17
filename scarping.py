@@ -1,14 +1,27 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
-urls = [ "https://www.ufc.com/athletes/all?gender=All&search=&page={0}".format(i) for i in range(2,20) ]
+file = open('joueur.txt','w',encoding='utf-8')
+URL = "https://www.ufc.com/rankings"
+page = requests.get(URL)
+soup = BeautifulSoup(page.content, "html.parser")
+
+###########################################################
+listu = []
+for link in soup.find_all('div', attrs={"class":"info"}):
+    listu.append(link.text)
+
+listo = [ i for i in listu[:-5] ]
+listi = [ i for i in listo[1:] ]
+lista = [ i.replace('\n',' ') for i in listi ]
 
 file = open('joueur.txt','w',encoding='utf-8')
 
-for url in urls :
-    page = requests.get(url)
+for i in lista:
+    file.write( i+"\n" )
 
-    soup = BeautifulSoup(page.content, "html.parser")
-    print(url)
-    for link in soup.find_all('div', attrs={"class":"c-listing-athlete-flipcard__front"}):
-        file.write("{0}\n".format(link.text))
+#############################################################
+
+for link in soup.find_all("a"):
+    print(link.get("href"))
